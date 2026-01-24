@@ -212,9 +212,48 @@
         }
 
         .day.has-event {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
             font-weight: bold;
+        }
+
+        .day.event-perritos {
+            background: linear-gradient(135deg, #a8d8ff 0%, #7ec8f5 100%);
+        }
+
+        .day.event-planes {
+            background: linear-gradient(135deg, #ffc0e5 0%, #ff8ec4 100%);
+        }
+
+        .day.event-voluntariado {
+            background: linear-gradient(135deg, #fff4b8 0%, #ffe66d 100%);
+        }
+
+        .day.event-comidas {
+            background: linear-gradient(135deg, #ffd4a3 0%, #ffb366 100%);
+        }
+
+        .day.event-otros {
+            background: linear-gradient(135deg, #d4a5ff 0%, #b87dff 100%);
+        }
+
+        .day.event-multiple {
+            background: linear-gradient(135deg, 
+                #a8d8ff 0%, #a8d8ff 20%,
+                #ffc0e5 20%, #ffc0e5 40%,
+                #fff4b8 40%, #fff4b8 60%,
+                #ffd4a3 60%, #ffd4a3 80%,
+                #d4a5ff 80%, #d4a5ff 100%);
+        }
+
+        .day.event-two-1 {
+            background: linear-gradient(to bottom right, var(--color1) 50%, var(--color2) 50%);
+        }
+
+        .day.event-three-1 {
+            background: linear-gradient(135deg, 
+                var(--color1) 0%, var(--color1) 33.33%,
+                var(--color2) 33.33%, var(--color2) 66.66%,
+                var(--color3) 66.66%, var(--color3) 100%);
         }
 
         .stats {
@@ -389,11 +428,25 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
-        .event-card.perritos { border-left: 4px solid #f093fb; }
-        .event-card.voluntariado { border-left: 4px solid #4facfe; }
-        .event-card.planes { border-left: 4px solid #43e97b; }
-        .event-card.comidas { border-left: 4px solid #ff6b6b; }
-        .event-card.otros { border-left: 4px solid #feca57; }
+        .event-card.perritos {
+            border-left: 4px solid #7ec8f5;
+        }
+
+        .event-card.voluntariado {
+            border-left: 4px solid #ffe66d;
+        }
+
+        .event-card.planes {
+            border-left: 4px solid #ff8ec4;
+        }
+
+        .event-card.comidas {
+            border-left: 4px solid #ffb366;
+        }
+
+        .event-card.otros {
+            border-left: 4px solid #b87dff;
+        }
 
         .event-header {
             display: flex;
@@ -684,6 +737,13 @@
 
         const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         const typeIcons = {perritos: '🐕', voluntariado: '🦴', planes: '💕', comidas: '🍔', otros: '✨'};
+        const typeColors = {
+            perritos: '#a8d8ff',
+            planes: '#ffc0e5', 
+            voluntariado: '#fff4b8',
+            comidas: '#ffd4a3',
+            otros: '#d4a5ff'
+        };
 
         function calculateTotal() {
             const isDayBoarding = document.getElementById('isDayBoarding').checked;
@@ -800,7 +860,7 @@
                 day.textContent = i;
                 const dateStr = `${currentYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 
-                const hasEvent = events.some(e => {
+                const dayEvents = events.filter(e => {
                     if (e.startDate && e.endDate) {
                         const start = new Date(e.startDate + 'T00:00:00');
                         const end = new Date(e.endDate + 'T00:00:00');
@@ -810,8 +870,26 @@
                     return e.date === dateStr;
                 });
                 
-                if (hasEvent) day.classList.add('has-event');
-                if (today.getDate() === i && today.getMonth() === selectedMonth && today.getFullYear() === currentYear && !hasEvent) {
+                if (dayEvents.length > 0) {
+                    day.classList.add('has-event');
+                    
+                    if (dayEvents.length === 1) {
+                        day.classList.add('event-' + dayEvents[0].type);
+                    } else if (dayEvents.length === 2) {
+                        day.classList.add('event-two-1');
+                        day.style.setProperty('--color1', typeColors[dayEvents[0].type]);
+                        day.style.setProperty('--color2', typeColors[dayEvents[1].type]);
+                    } else if (dayEvents.length === 3) {
+                        day.classList.add('event-three-1');
+                        day.style.setProperty('--color1', typeColors[dayEvents[0].type]);
+                        day.style.setProperty('--color2', typeColors[dayEvents[1].type]);
+                        day.style.setProperty('--color3', typeColors[dayEvents[2].type]);
+                    } else {
+                        day.classList.add('event-multiple');
+                    }
+                }
+                
+                if (today.getDate() === i && today.getMonth() === selectedMonth && today.getFullYear() === currentYear && dayEvents.length === 0) {
                     day.classList.add('today');
                 }
                 day.onclick = () => openDayModal(i);
