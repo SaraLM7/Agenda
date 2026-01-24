@@ -606,14 +606,51 @@
                 <input type="text" id="eventTitle" placeholder="Ej: Cuidé a Max">
             </div>
 
-            <div id="perritosFields" class="extra-fields">
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="multiDay" onchange="toggleMultiDay()" style="width: auto;">
+                    ¿Evento de varios días?
+                </label>
+            </div>
+
+            <div id="singleDateField" class="form-group">
+                <label>Fecha</label>
+                <input type="date" id="singleDate">
+            </div>
+
+            <div id="multiDateFields" class="extra-fields">
                 <div class="form-group">
-                    <label>¿Cuántas noches?</label>
-                    <input type="number" id="noches" min="0" placeholder="0" oninput="calculateTotal()">
+                    <label>Fecha inicio</label>
+                    <input type="date" id="startDate">
                 </div>
                 <div class="form-group">
-                    <label>¿Cuánto por noche?</label>
-                    <input type="number" id="porNoche" min="0" step="0.01" placeholder="0.00" oninput="calculateTotal()">
+                    <label>Fecha fin</label>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+
+            <div id="perritosFields" class="extra-fields">
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="isDayBoarding" onchange="toggleDayBoarding()" style="width: auto;">
+                        ☀️ Day boarding (sin noche)
+                    </label>
+                </div>
+                <div id="overnightFields">
+                    <div class="form-group">
+                        <label>¿Cuántas noches?</label>
+                        <input type="number" id="noches" min="0" placeholder="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label>¿Cuánto por noche?</label>
+                        <input type="number" id="porNoche" min="0" step="0.01" placeholder="0.00" oninput="calculateTotal()">
+                    </div>
+                </div>
+                <div id="dayBoardingField" class="extra-fields">
+                    <div class="form-group">
+                        <label>¿Cuánto cobraste total?</label>
+                        <input type="number" id="dayBoardingPay" min="0" step="0.01" placeholder="0.00">
+                    </div>
                 </div>
                 <div class="total-display" id="totalPerritos">Total: $0.00</div>
             </div>
@@ -649,9 +686,28 @@
         const typeIcons = {perritos: '🐕', voluntariado: '🦴', planes: '💕', comidas: '🍔', otros: '✨'};
 
         function calculateTotal() {
-            const noches = parseFloat(document.getElementById('noches').value) || 0;
-            const porNoche = parseFloat(document.getElementById('porNoche').value) || 0;
-            document.getElementById('totalPerritos').textContent = `Total: $${(noches * porNoche).toFixed(2)}`;
+            const isDayBoarding = document.getElementById('isDayBoarding').checked;
+            if (isDayBoarding) {
+                const pay = parseFloat(document.getElementById('dayBoardingPay').value) || 0;
+                document.getElementById('totalPerritos').textContent = `Total: ${pay.toFixed(2)}`;
+            } else {
+                const noches = parseFloat(document.getElementById('noches').value) || 0;
+                const porNoche = parseFloat(document.getElementById('porNoche').value) || 0;
+                document.getElementById('totalPerritos').textContent = `Total: ${(noches * porNoche).toFixed(2)}`;
+            }
+        }
+
+        function toggleMultiDay() {
+            const isMultiDay = document.getElementById('multiDay').checked;
+            document.getElementById('singleDateField').style.display = isMultiDay ? 'none' : 'block';
+            document.getElementById('multiDateFields').classList.toggle('show', isMultiDay);
+        }
+
+        function toggleDayBoarding() {
+            const isDayBoarding = document.getElementById('isDayBoarding').checked;
+            document.getElementById('overnightFields').style.display = isDayBoarding ? 'none' : 'block';
+            document.getElementById('dayBoardingField').classList.toggle('show', isDayBoarding);
+            calculateTotal();
         }
 
         function loadData() {
@@ -747,7 +803,17 @@
             const date = new Date(currentYear, selectedMonth, day);
             const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
             document.getElementById('dayModalTitle').textContent = `${dayName.charAt(0).toUpperCase() + dayName.slice(1)}, ${day} de ${months[selectedMonth]} ${currentYear}`;
-            const dayEvents = events.filter(e => e.date === selectedDate);
+            
+            // Set default date in form
+            document.getElementById('singleDate').value = selectedDate;
+            
+            const dayEvents = events.filter(e => {
+                if (e.startDate && e.endDate) {
+                    return selectedDate >= e.startDate && selectedDate <= e.endDate;
+                }
+                return e.date === selectedDate;
+            });
+            
             const list = document.getElementById('dayEventsList');
             if (dayEvents.length === 0) {
                 list.innerHTML = '<div style="text-align:center;padding:30px;color:#999"><div style="font-size:50px">📅</div><div>No hay eventos este día</div></div>';
@@ -755,11 +821,23 @@
                 list.innerHTML = dayEvents.map(e => {
                     let details = '';
                     if (e.type === 'perritos' && e.total) {
-                        details = `<div class="event-details">${e.noches ? `🌙 ${e.noches} noche${e.noches > 1 ? 's' : ''} × $${e.porNoche || 0}<br>` : ''}💰 Total: $${parseFloat(e.total).toFixed(2)}</div>`;
+                        if (e.isDayBoarding) {
+                            details = `<div class="event-details">☀️ Day boarding<br>💰 Total: ${parseFloat(e.total).toFixed(2)}</div>`;
+                        } else {
+                            details = `<div class="event-details">${e.noches ? `🌙 ${e.noches} noche${e.noches > 1 ? 's' : ''} × ${e.porNoche || 0}<br>` : ''}💰 Total: ${parseFloat(e.total).toFixed(2)}</div>`;
+                        }
                     } else if (e.type === 'comidas' && e.gasto) {
-                        details = `<div class="event-details">💵 Gastaste: $${parseFloat(e.gasto).toFixed(2)}${e.lugar ? `<br>📍 ${e.lugar}` : ''}</div>`;
+                        details = `<div class="event-details">💵 Gastaste: ${parseFloat(e.gasto).toFixed(2)}${e.lugar ? `<br>📍 ${e.lugar}` : ''}</div>`;
                     }
-                    return `<div class="event-card ${e.type}"><div class="event-header"><span class="event-type">${typeIcons[e.type]}</span><span class="event-title">${e.title}</span></div>${details}${e.notes ? `<div class="event-details">${e.notes}</div>` : ''}<button class="delete-btn" onclick="deleteEvent(${e.id})">🗑️ Eliminar</button></div>`;
+                    
+                    let dateInfo = '';
+                    if (e.startDate && e.endDate) {
+                        const start = new Date(e.startDate);
+                        const end = new Date(e.endDate);
+                        dateInfo = `<div class="event-details">📅 ${start.getDate()}/${start.getMonth()+1} - ${end.getDate()}/${end.getMonth()+1}</div>`;
+                    }
+                    
+                    return `<div class="event-card ${e.type}"><div class="event-header"><span class="event-type">${typeIcons[e.type]}</span><span class="event-title">${e.title}</span></div>${dateInfo}${details}${e.notes ? `<div class="event-details">${e.notes}</div>` : ''}<button class="delete-btn" onclick="deleteEvent(${e.id})">🗑️ Eliminar</button></div>`;
                 }).join('');
             }
             document.getElementById('dayModal').classList.add('show');
