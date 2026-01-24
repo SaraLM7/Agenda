@@ -710,6 +710,8 @@
             calculateTotal();
         }
 
+        document.getElementById('dayBoardingPay').addEventListener('input', calculateTotal);
+
         function loadData() {
             const saved = localStorage.getItem('calendarioPersonal');
             if (saved) events = JSON.parse(saved);
@@ -738,7 +740,17 @@
             const grid = document.getElementById('monthsGrid');
             grid.innerHTML = '';
             months.forEach((month, i) => {
-                const monthEvents = events.filter(e => new Date(e.date).getFullYear() === currentYear && new Date(e.date).getMonth() === i);
+                const monthEvents = events.filter(e => {
+                    const eDate = new Date(e.date);
+                    if (e.startDate && e.endDate) {
+                        const monthStart = new Date(currentYear, i, 1);
+                        const monthEnd = new Date(currentYear, i + 1, 0);
+                        const start = new Date(e.startDate);
+                        const end = new Date(e.endDate);
+                        return (start <= monthEnd && end >= monthStart);
+                    }
+                    return eDate.getFullYear() === currentYear && eDate.getMonth() === i;
+                });
                 const card = document.createElement('div');
                 card.className = 'month-card' + (monthEvents.length > 0 ? ' has-events' : '');
                 card.onclick = () => openMonth(i);
@@ -781,8 +793,19 @@
                 day.className = 'day';
                 day.textContent = i;
                 const dateStr = `${currentYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                if (events.filter(e => e.date === dateStr).length > 0) day.classList.add('has-event');
-                if (today.getDate() === i && today.getMonth() === selectedMonth && today.getFullYear() === currentYear && !day.classList.contains('has-event')) {
+                
+                const hasEvent = events.some(e => {
+                    if (e.startDate && e.endDate) {
+                        const start = new Date(e.startDate + 'T00:00:00');
+                        const end = new Date(e.endDate + 'T00:00:00');
+                        const current = new Date(dateStr + 'T00:00:00');
+                        return current >= start && current <= end;
+                    }
+                    return e.date === dateStr;
+                });
+                
+                if (hasEvent) day.classList.add('has-event');
+                if (today.getDate() === i && today.getMonth() === selectedMonth && today.getFullYear() === currentYear && !hasEvent) {
                     day.classList.add('today');
                 }
                 day.onclick = () => openDayModal(i);
@@ -809,7 +832,10 @@
             
             const dayEvents = events.filter(e => {
                 if (e.startDate && e.endDate) {
-                    return selectedDate >= e.startDate && selectedDate <= e.endDate;
+                    const start = new Date(e.startDate + 'T00:00:00');
+                    const end = new Date(e.endDate + 'T00:00:00');
+                    const current = new Date(selectedDate + 'T00:00:00');
+                    return current >= start && current <= end;
                 }
                 return e.date === selectedDate;
             });
@@ -837,7 +863,7 @@
                         dateInfo = `<div class="event-details">📅 ${start.getDate()}/${start.getMonth()+1} - ${end.getDate()}/${end.getMonth()+1}</div>`;
                     }
                     
-                    return `<div class="event-card ${e.type}"><div class="event-header"><span class="event-type">${typeIcons[e.type]}</span><span class="event-title">${e.title}</span></div>${dateInfo}${details}${e.notes ? `<div class="event-details">${e.notes}</div>` : ''}<button class="delete-btn" onclick="deleteEvent(${e.id})">🗑️ Eliminar</button></div>`;
+                    return `<div class="event-card ${e.type}"><div class="event-header"><span class="event-type">${typeIcons[e.type]}</span><span class="event-title">${e.title}</span></div>${dateInfo}${details}${e.notes ? `<div class="event-details">${e.notes}</div>` : ''}<div style="display:flex;gap:8px;margin-top:8px;margin-left:26px;"><button class="delete-btn" onclick="event.stopPropagation(); editEvent(${e.id})" style="background:#4facfe;">✏️ Editar</button><button class="delete-btn" onclick="event.stopPropagation(); deleteEvent(${e.id})">🗑️ Eliminar</button></div></div>`;
                 }).join('');
             }
             document.getElementById('dayModal').classList.add('show');
@@ -853,6 +879,7 @@
 
         function closeAddModal() {
             document.getElementById('addModal').classList.remove('show');
+            editingEventId = null;
             resetForm();
         }
 
@@ -860,14 +887,24 @@
             selectedType = '';
             document.getElementById('eventTitle').value = '';
             document.getElementById('eventNotes').value = '';
+            document.getElementById('multiDay').checked = false;
+            document.getElementById('singleDate').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('isDayBoarding').checked = false;
             document.getElementById('noches').value = '';
             document.getElementById('porNoche').value = '';
+            document.getElementById('dayBoardingPay').value = '';
             document.getElementById('gastoComida').value = '';
             document.getElementById('lugarComida').value = '';
             document.getElementById('totalPerritos').textContent = 'Total: $0.00';
             document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('perritosFields').classList.remove('show');
             document.getElementById('comidasFields').classList.remove('show');
+            document.getElementById('singleDateField').style.display = 'block';
+            document.getElementById('multiDateFields').classList.remove('show');
+            document.getElementById('overnightFields').style.display = 'block';
+            document.getElementById('dayBoardingField').classList.remove('show');
         }
 
         function selectType(type) {
@@ -885,26 +922,59 @@
             const title = document.getElementById('eventTitle').value.trim();
             if (!title) { alert('¡Escribe un título! 📝'); return; }
 
+            const isMultiDay = document.getElementById('multiDay').checked;
+            let startDate, endDate;
+            
+            if (isMultiDay) {
+                startDate = document.getElementById('startDate').value;
+                endDate = document.getElementById('endDate').value;
+                if (!startDate || !endDate) { alert('¡Completa las fechas de inicio y fin!'); return; }
+                if (startDate > endDate) { alert('¡La fecha de inicio debe ser antes que la de fin!'); return; }
+            } else {
+                startDate = endDate = document.getElementById('singleDate').value || selectedDate;
+            }
+
             const ev = {
-                id: Date.now(),
+                id: editingEventId || Date.now(),
                 type: selectedType,
                 title: title,
-                date: selectedDate,
+                date: startDate,
+                startDate: isMultiDay ? startDate : null,
+                endDate: isMultiDay ? endDate : null,
                 notes: document.getElementById('eventNotes').value.trim()
             };
 
             if (selectedType === 'perritos') {
-                const noches = parseFloat(document.getElementById('noches').value) || 0;
-                const porNoche = parseFloat(document.getElementById('porNoche').value) || 0;
-                ev.noches = noches;
-                ev.porNoche = porNoche;
-                ev.total = noches * porNoche;
+                const isDayBoarding = document.getElementById('isDayBoarding').checked;
+                ev.isDayBoarding = isDayBoarding;
+                
+                if (isDayBoarding) {
+                    const pay = parseFloat(document.getElementById('dayBoardingPay').value) || 0;
+                    ev.total = pay;
+                } else {
+                    const noches = parseFloat(document.getElementById('noches').value) || 0;
+                    const porNoche = parseFloat(document.getElementById('porNoche').value) || 0;
+                    ev.noches = noches;
+                    ev.porNoche = porNoche;
+                    ev.total = noches * porNoche;
+                }
             } else if (selectedType === 'comidas') {
                 ev.gasto = parseFloat(document.getElementById('gastoComida').value) || 0;
                 ev.lugar = document.getElementById('lugarComida').value.trim();
             }
 
-            events.push(ev);
+            if (editingEventId) {
+                // Update existing event
+                const index = events.findIndex(e => e.id === editingEventId);
+                if (index !== -1) {
+                    events[index] = ev;
+                }
+                editingEventId = null;
+            } else {
+                // Add new event
+                events.push(ev);
+            }
+            
             saveData();
             closeAddModal();
             renderCalendar();
@@ -939,6 +1009,61 @@
                 updateStats();
                 openDayModal(parseInt(selectedDate.split('-')[2]));
             }
+        }
+
+        let editingEventId = null;
+
+        function editEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (!event) return;
+            
+            editingEventId = id;
+            closeDayModal();
+            
+            // Fill form with existing data
+            selectedType = event.type;
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.type-btn').forEach(b => {
+                if (b.textContent.includes(typeIcons[event.type])) {
+                    b.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('eventTitle').value = event.title;
+            document.getElementById('eventNotes').value = event.notes || '';
+            
+            // Handle multi-day
+            if (event.startDate && event.endDate) {
+                document.getElementById('multiDay').checked = true;
+                document.getElementById('startDate').value = event.startDate;
+                document.getElementById('endDate').value = event.endDate;
+                toggleMultiDay();
+            } else {
+                document.getElementById('multiDay').checked = false;
+                document.getElementById('singleDate').value = event.date;
+            }
+            
+            // Show type-specific fields
+            if (event.type === 'perritos') {
+                document.getElementById('perritosFields').classList.add('show');
+                if (event.isDayBoarding) {
+                    document.getElementById('isDayBoarding').checked = true;
+                    document.getElementById('dayBoardingPay').value = event.total || 0;
+                    toggleDayBoarding();
+                } else {
+                    document.getElementById('isDayBoarding').checked = false;
+                    document.getElementById('noches').value = event.noches || 0;
+                    document.getElementById('porNoche').value = event.porNoche || 0;
+                    toggleDayBoarding();
+                }
+                calculateTotal();
+            } else if (event.type === 'comidas') {
+                document.getElementById('comidasFields').classList.add('show');
+                document.getElementById('gastoComida').value = event.gasto || 0;
+                document.getElementById('lugarComida').value = event.lugar || '';
+            }
+            
+            showAddForm();
         }
 
         window.onclick = function(e) {
