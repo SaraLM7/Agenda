@@ -701,6 +701,12 @@
             const isMultiDay = document.getElementById('multiDay').checked;
             document.getElementById('singleDateField').style.display = isMultiDay ? 'none' : 'block';
             document.getElementById('multiDateFields').classList.toggle('show', isMultiDay);
+            
+            // When switching to multi-day, set end date to same as start if not set
+            if (isMultiDay && !document.getElementById('endDate').value) {
+                const startVal = document.getElementById('startDate').value || selectedDate;
+                document.getElementById('endDate').value = startVal;
+            }
         }
 
         function toggleDayBoarding() {
@@ -827,8 +833,9 @@
             const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
             document.getElementById('dayModalTitle').textContent = `${dayName.charAt(0).toUpperCase() + dayName.slice(1)}, ${day} de ${months[selectedMonth]} ${currentYear}`;
             
-            // Set default date in form
+            // Set default dates in form to current month/day
             document.getElementById('singleDate').value = selectedDate;
+            document.getElementById('startDate').value = selectedDate;
             
             const dayEvents = events.filter(e => {
                 if (e.startDate && e.endDate) {
@@ -874,6 +881,17 @@
         }
 
         function showAddForm() {
+            // Set default dates to the selected date or current viewing month
+            if (!document.getElementById('singleDate').value) {
+                document.getElementById('singleDate').value = selectedDate;
+            }
+            if (!document.getElementById('startDate').value) {
+                document.getElementById('startDate').value = selectedDate;
+            }
+            if (!document.getElementById('endDate').value) {
+                // Default end date to same as start
+                document.getElementById('endDate').value = selectedDate;
+            }
             document.getElementById('addModal').classList.add('show');
         }
 
