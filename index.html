@@ -1,1217 +1,823 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Calendario 😊✨</title>
+    <title>Sara Smith</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:          #FAF8FC;
+            --white:       #FFFFFF;
+            --dark:        #1A1A1A;
+            --mid:         #4B5563;
+            --light:       #9CA3AF;
+            --coral:       #C2527C;
+            --coral-light: #F8E0EC;
+            --teal:        #7B5EA7;
+            --teal-light:  #EDE0F5;
+            --gold:        #C9963A;
+            --gold-light:  #FBF3E0;
+            --border:      #E8E4EF;
+            --radius:      14px;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 15px;
-            padding-bottom: 20px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            line-height: 1.6;
+            font-size: 16px;
         }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(250, 248, 252, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--mid);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--coral); }
+
+        /* ===== SHARED ===== */
+        section { padding: 100px 0; }
 
         .container {
-            max-width: 500px;
+            max-width: 980px;
             margin: 0 auto;
+            padding: 0 2rem;
         }
 
-        .header {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--coral);
+            margin-bottom: 0.4rem;
         }
 
-        .header h1 {
-            color: #667eea;
-            font-size: 24px;
-            margin-bottom: 15px;
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--dark);
+            margin-bottom: 3rem;
+            line-height: 1.15;
         }
 
-        .year-selector {
+        /* ===== HERO ===== */
+        #hero {
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            padding-top: 62px;
         }
 
-        .nav-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            width: 35px;
-            height: 35px;
+        .hero-content { max-width: 680px; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--teal-light);
+            color: var(--teal);
+            border-radius: 100px;
+            padding: 0.35rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 1.75rem;
+            letter-spacing: 0.01em;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            background: var(--teal);
             border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s;
+            flex-shrink: 0;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .nav-btn:active {
-            transform: scale(0.9);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.85); }
         }
 
-        .current-year {
-            font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
-            min-width: 100px;
+        .hero-name {
+            font-size: clamp(3.2rem, 9vw, 5.8rem);
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            line-height: 0.95;
+            color: var(--dark);
+            margin-bottom: 1.1rem;
         }
 
-        .months-grid {
+        .hero-name span { color: var(--coral); }
+
+        .hero-title {
+            font-size: 1.1rem;
+            color: var(--mid);
+            font-weight: 400;
+            margin-bottom: 1.75rem;
+            line-height: 1.55;
+            max-width: 540px;
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .tag {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.28rem 0.85rem;
+            font-size: 0.78rem;
+            color: var(--mid);
+            font-weight: 500;
+        }
+
+        .tag.gold {
+            background: var(--gold-light);
+            border-color: #E9C876;
+            color: #8B6520;
+        }
+
+        .tag.teal {
+            background: var(--teal-light);
+            border-color: #C0A0DC;
+            color: var(--teal);
+        }
+
+        .hero-cta {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--dark);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.75rem;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.15s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: var(--coral);
+            transform: translateY(-2px);
+        }
+
+        .btn-ghost {
+            color: var(--mid);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .btn-ghost:hover { color: var(--coral); }
+
+        .lang-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            font-size: 0.82rem;
+            color: var(--mid);
+        }
+
+        .lang-sep { color: var(--border); margin: 0 0.15rem; }
+
+        /* ===== EXPERIENCE ===== */
+        #experience { background: var(--white); }
+
+        .timeline { position: relative; padding-left: 0; }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--coral) 0%, var(--teal) 100%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            padding-left: 2.25rem;
+            padding-bottom: 2.75rem;
+            position: relative;
+        }
+
+        .timeline-item:last-child { padding-bottom: 0; }
+
+        .timeline-dot {
+            position: absolute;
+            left: -5px;
+            top: 7px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--coral);
+            border: 2.5px solid var(--white);
+            box-shadow: 0 0 0 2px var(--coral);
+        }
+
+        .timeline-dot.teal {
+            background: var(--teal);
+            box-shadow: 0 0 0 2px var(--teal);
+        }
+
+        .timeline-meta {
+            font-size: 0.74rem;
+            color: var(--light);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            margin-bottom: 0.2rem;
+        }
+
+        .timeline-company {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--coral);
+            margin-bottom: 0.1rem;
+        }
+
+        .timeline-company.teal { color: var(--teal); }
+
+        .timeline-role {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.7rem;
+            letter-spacing: -0.02em;
+        }
+
+        .timeline-bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.38rem;
+        }
+
+        .timeline-bullets li {
+            font-size: 0.875rem;
+            color: var(--mid);
+            padding-left: 1.1rem;
+            position: relative;
+            line-height: 1.55;
+        }
+
+        .timeline-bullets li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--coral);
+            font-size: 0.75rem;
+            top: 0.12rem;
+        }
+
+        .edu-block {
+            margin-top: 3rem;
+            padding: 1.5rem 1.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .edu-icon { font-size: 2rem; }
+
+        .edu-school {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.01em;
+        }
+
+        .edu-detail {
+            font-size: 0.82rem;
+            color: var(--mid);
+            margin-top: 0.15rem;
+        }
+
+        .skills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-top: 3rem;
+        }
+
+        .skills-label {
+            width: 100%;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--light);
+            margin-top: 1.5rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .keychain-note {
+            color: rgba(255,255,255,0.38);
+            font-size: 0.74rem;
+            margin-top: 1rem;
+            margin-bottom: 0;
+            font-style: italic;
+        }
+
+        .chip {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.28rem 0.9rem;
+            font-size: 0.78rem;
+            color: var(--mid);
+            font-weight: 500;
+        }
+
+        .chip.coral {
+            background: var(--coral-light);
+            border-color: #DFA0BF;
+            color: #8B2252;
+        }
+
+        .chip.teal {
+            background: var(--teal-light);
+            border-color: #C0A0DC;
+            color: var(--teal);
+        }
+
+        /* ===== ABOUT ===== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .about-photo-wrap { position: relative; }
+
+        .about-photo {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            border-radius: var(--radius);
+            object-fit: cover;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.13);
+            display: block;
+        }
+
+        .about-photo-fallback {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--teal-light), var(--coral-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+        }
+
+        .about-bio p {
+            color: var(--mid);
+            font-size: 0.95rem;
+            line-height: 1.85;
+            margin-bottom: 1.5rem;
+        }
+
+        .lang-highlight {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--teal-light);
+            border: 1px solid #C0A0DC;
+            color: #5B3D8A;
+            border-radius: var(--radius);
+            padding: 0.6rem 1rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .interests {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 0.85rem;
+            margin-top: 0.5rem;
         }
 
-        .month-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            padding: 20px 10px;
+        .interest-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1rem;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            border: 2px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .month-card:active {
-            transform: scale(0.95);
+        .interest-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(0,0,0,0.08);
         }
 
-        .month-card.has-events {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-
-        .month-card.has-events .month-count {
-            color: rgba(255,255,255,0.9);
-        }
-
-        .month-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-
-        .month-card.has-events .month-name {
-            color: white;
-        }
-
-        .month-count {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .calendar-view {
-            display: none;
-        }
-
-        .calendar-view.active {
+        .interest-icon {
+            font-size: 2rem;
             display: block;
+            margin-bottom: 0.6rem;
         }
 
-        .months-view.active {
-            display: block;
+        .interest-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
         }
 
-        .month-header {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .interest-desc {
+            font-size: 0.74rem;
+            color: var(--light);
+            line-height: 1.45;
         }
 
-        .back-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
+/* ===== KEYCHAIN CTA ===== */
+        #keychain {
+            padding: 0 0 80px 0;
         }
 
-        .month-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .calendar-container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .weekday {
-            text-align: center;
-            font-weight: bold;
-            color: #667eea;
-            font-size: 12px;
-            padding: 8px 0;
-        }
-
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-        }
-
-        .day {
-            aspect-ratio: 1;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background: #f8f9fa;
-            position: relative;
-            font-size: 14px;
-        }
-
-        .day:active {
-            transform: scale(0.95);
-        }
-
-        .day.other-month {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .day.today {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: bold;
-        }
-
-        .day.has-event {
-            color: white;
-            font-weight: bold;
-        }
-
-        .day.event-perritos {
-            background: linear-gradient(135deg, #a8d8ff 0%, #7ec8f5 100%);
-        }
-
-        .day.event-planes {
-            background: linear-gradient(135deg, #ffc0e5 0%, #ff8ec4 100%);
-        }
-
-        .day.event-voluntariado {
-            background: linear-gradient(135deg, #fff4b8 0%, #ffe66d 100%);
-        }
-
-        .day.event-comidas {
-            background: linear-gradient(135deg, #ffd4a3 0%, #ffb366 100%);
-        }
-
-        .day.event-otros {
-            background: linear-gradient(135deg, #d4a5ff 0%, #b87dff 100%);
-        }
-
-        .day.event-multiple {
-            background: linear-gradient(135deg, 
-                #a8d8ff 0%, #a8d8ff 20%,
-                #ffc0e5 20%, #ffc0e5 40%,
-                #fff4b8 40%, #fff4b8 60%,
-                #ffd4a3 60%, #ffd4a3 80%,
-                #d4a5ff 80%, #d4a5ff 100%);
-        }
-
-        .day.event-two-1 {
-            background: linear-gradient(to bottom right, var(--color1) 50%, var(--color2) 50%);
-        }
-
-        .day.event-three-1 {
-            background: linear-gradient(135deg, 
-                var(--color1) 0%, var(--color1) 33.33%,
-                var(--color2) 33.33%, var(--color2) 66.66%,
-                var(--color3) 66.66%, var(--color3) 100%);
-        }
-
-        .stats {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .stats h2 {
-            font-size: 16px;
-            margin-bottom: 15px;
+        .keychain-card {
+            background: linear-gradient(135deg, var(--dark) 0%, #2C2C3E 100%);
+            border-radius: var(--radius);
+            padding: 3.5rem 3rem;
             text-align: center;
         }
 
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
+        .keychain-card h2 {
+            color: white;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
         }
 
-        .stat-label {
-            font-size: 14px;
+        .keychain-card p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.92rem;
+            margin-bottom: 2rem;
+            max-width: 460px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.65;
         }
 
-        .stat-value {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .modal.show {
-            display: block;
-        }
-
-        .modal-content {
+        .btn-white {
             background: white;
-            max-width: 500px;
-            margin: 20px auto;
-            border-radius: 20px;
-            padding: 25px;
-            position: relative;
+            color: var(--dark);
+            text-decoration: none;
+            padding: 0.75rem 1.75rem;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: inline-block;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
         }
 
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #999;
+        .btn-white:hover {
+            background: var(--coral);
+            color: white;
+            transform: translateY(-2px);
         }
 
-        .modal h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .type-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .type-btn {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            background: white;
-            cursor: pointer;
-            font-size: 14px;
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 2.5rem 2rem;
             text-align: center;
+            border-top: 1px solid var(--border);
         }
 
-        .type-btn.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        footer p {
+            font-size: 0.82rem;
+            color: var(--light);
+            line-height: 1.8;
         }
 
-        .extra-fields {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
+        footer a {
+            color: var(--coral);
+            text-decoration: none;
+            font-weight: 500;
         }
 
-        .extra-fields.show {
-            display: block;
-        }
+        footer a:hover { text-decoration: underline; }
 
-        .total-display {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .event-card {
-            background: white;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .event-card.perritos {
-            border-left: 4px solid #7ec8f5;
-        }
-
-        .event-card.voluntariado {
-            border-left: 4px solid #ffe66d;
-        }
-
-        .event-card.planes {
-            border-left: 4px solid #ff8ec4;
-        }
-
-        .event-card.comidas {
-            border-left: 4px solid #ffb366;
-        }
-
-        .event-card.otros {
-            border-left: 4px solid #b87dff;
-        }
-
-        .event-header {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .event-type {
-            font-size: 18px;
-        }
-
-        .event-title {
-            flex: 1;
-            font-weight: bold;
-            color: #333;
-            font-size: 15px;
-        }
-
-        .event-details {
-            color: #666;
-            font-size: 13px;
-            margin-left: 26px;
-        }
-
-        .delete-btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 8px;
-            margin-left: 26px;
-        }
-
-        .day-modal-header {
-            background: white;
-            border: 3px solid #667eea;
-            color: #667eea;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .add-event-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-
-        .backup-section {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .backup-title {
-            color: #667eea;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .backup-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .export-btn {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .import-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .backup-note {
-            font-size: 11px;
-            color: #999;
-            margin-top: 8px;
-            text-align: center;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 760px) {
+            nav { padding: 0 1.25rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 1.25rem; }
+            section { padding: 70px 0; }
+            .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .about-photo, .about-photo-fallback { aspect-ratio: 1 / 1; width: 200px; margin: 0 auto; }
+            .interests { grid-template-columns: 1fr; }
+            .keychain-card { padding: 2.5rem 1.5rem; }
+            #travel-map { height: 340px; }
         }
     </style>
 </head>
 <body>
+
+<!-- NAV -->
+<nav>
+    <a href="#hero" class="nav-logo">Sara Smith</a>
+    <ul class="nav-links">
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="mailto:smith.sara0727@gmail.com">Contact</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
     <div class="container">
-        <div id="monthsView" class="months-view active">
-            <div class="header">
-                <h1>😊 Mi Calendario ✨</h1>
-                <div class="year-selector">
-                    <button class="nav-btn" onclick="changeYear(-1)">←</button>
-                    <div class="current-year" id="currentYear">2025</div>
-                    <button class="nav-btn" onclick="changeYear(1)">→</button>
-                </div>
-                <div class="months-grid" id="monthsGrid"></div>
+        <div class="hero-content">
+<h1 class="hero-name">Sara<br><span>Smith.</span></h1>
+            <p class="hero-title">
+                Technical Project Manager &amp; AI Workflow Designer, helping teams work smarter through technology, data, and clear thinking.
+            </p>
+            <div class="hero-tags">
+                <span class="tag">Los Angeles, CA</span>
+                <span class="tag gold">AI Agent Design</span>
+                <span class="tag">Data &amp; Media Insights</span>
+                <span class="tag">Survey Programming</span>
+                <span class="tag teal">Bilingual EN / ES</span>
             </div>
-
-            <div class="stats">
-                <h2>💰 Resumen del Año <span id="statsYear">2025</span></h2>
-                <div class="stat-item">
-                    <span class="stat-label">🐕 Noches cuidando</span>
-                    <span class="stat-value" id="totalNoches">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">💵 Ingreso (perritos)</span>
-                    <span class="stat-value" id="totalGanado">$0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">🍔 Gastado (comidas)</span>
-                    <span class="stat-value" id="totalComidas">$0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">🦴 Voluntariados</span>
-                    <span class="stat-value" id="totalVoluntariados">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">💕 Salidas/Planes</span>
-                    <span class="stat-value" id="totalPlanes">0</span>
-                </div>
+            <div class="hero-cta">
+                <a href="mailto:smith.sara0727@gmail.com" class="btn-primary">Get in touch</a>
+                <a href="#experience" class="btn-ghost">See my work &rarr;</a>
+                <a href="https://github.com/SaraLM7" class="btn-ghost" target="_blank" rel="noopener noreferrer">GitHub &rarr;</a>
             </div>
-
-            <div class="backup-section">
-                <h3 class="backup-title">⚙️ Backup de Datos</h3>
-                <div class="backup-buttons">
-                    <button class="export-btn" onclick="exportData()">📥 Exportar</button>
-                    <button class="import-btn" onclick="document.getElementById('importFile').click()">📤 Importar</button>
-                </div>
-                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
-                <p class="backup-note">Guarda tus datos antes de actualizar</p>
-            </div>
-        </div>
-
-        <div id="calendarView" class="calendar-view">
-            <div class="month-header">
-                <button class="back-btn" onclick="backToMonths()">← Volver</button>
-                <div class="month-title" id="monthTitle">Enero 2025</div>
-                <div style="width: 70px;"></div>
-            </div>
-
-            <div class="calendar-container">
-                <div class="weekdays">
-                    <div class="weekday">Dom</div>
-                    <div class="weekday">Lun</div>
-                    <div class="weekday">Mar</div>
-                    <div class="weekday">Mié</div>
-                    <div class="weekday">Jue</div>
-                    <div class="weekday">Vie</div>
-                    <div class="weekday">Sáb</div>
-                </div>
-                <div class="days-grid" id="daysGrid"></div>
+            <div class="lang-row">
+                <span>&#127482;&#127480; English</span>
+                <span class="lang-sep">&middot;</span>
+                <span>&#127474;&#127485; Espa&ntilde;ol</span>
+                <span style="color: var(--light); font-size: 0.76rem; margin-left: 0.2rem;">Fully bilingual</span>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="modal" id="dayModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeDayModal()">×</button>
-            <div class="day-modal-header">
-                <h2 id="dayModalTitle" style="margin: 0; font-size: 18px;">1 de Enero, 2025</h2>
-            </div>
-            <button class="add-event-btn" onclick="showAddForm()">+ Agregar Actividad</button>
-            <div id="dayEventsList"></div>
+<section id="keychain">
+    <div class="container">
+        <div class="keychain-card">
+            <h2>Loved the keychain? Get your own.</h2>
+            <p>
+                Custom keychains that tap directly to your website or portfolio. Perfect for conferences, networking events, and making a lasting first impression.
+            </p>
+            <a href="keychain.html" class="btn-white">
+                Order yours &rarr;
+            </a>
+            <p class="keychain-note">Not an ad, just someone with a very diverse skill set.</p>
         </div>
     </div>
+</section>
 
-    <div class="modal" id="addModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeAddModal()">×</button>
-            <h2>Agregar Actividad ✨</h2>
-            
-            <div class="form-group">
-                <label>¿Qué hiciste?</label>
-                <div class="type-buttons">
-                    <button type="button" class="type-btn" onclick="selectType('perritos')">🐕 Cuidar Perritos</button>
-                    <button type="button" class="type-btn" onclick="selectType('comidas')">🍔 Comida Afuera</button>
-                    <button type="button" class="type-btn" onclick="selectType('voluntariado')">🦴 Voluntariado</button>
-                    <button type="button" class="type-btn" onclick="selectType('planes')">💕 Salidas/Planes</button>
-                    <button type="button" class="type-btn" onclick="selectType('otros')">✨ Otros</button>
+<!-- EXPERIENCE -->
+<section id="experience">
+    <div class="container">
+        <p class="section-label">Career</p>
+        <h2 class="section-title">Experience</h2>
+
+        <div class="timeline">
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-meta">March 2025 to Present</div>
+                <div class="timeline-company">4Media Group</div>
+                <div class="timeline-role">Technical Project Manager</div>
+                <ul class="timeline-bullets">
+                    <li>Drove internal AI adoption by creating usage guidelines, workflows, and examples that helped teams integrate AI into daily operations with confidence.</li>
+                    <li>Designed and built AI-assisted workflows and internal tools to streamline survey setup, reporting, and documentation.</li>
+                    <li>Built and deployed custom internal AI agents with defined rules, guardrails, and workflows for consistent, scalable outputs across teams.</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot teal"></div>
+                <div class="timeline-meta">October 2022 to March 2025</div>
+                <div class="timeline-company teal">4Media Group</div>
+                <div class="timeline-role">Insights Analyst</div>
+                <ul class="timeline-bullets">
+                    <li>Built and maintained dynamic Excel workbooks that automated calculations, strengthened data integrity, and enabled real-time reporting.</li>
+                    <li>Led comprehensive media and survey landscape analyses, identifying gaps, trends, and whitespace opportunities that shaped client strategy.</li>
+                    <li>Designed insight maps to visualize customer locations and audience concentration for targeted PR outreach.</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-meta">August 2021 to October 2022</div>
+                <div class="timeline-company">NBCUniversal</div>
+                <div class="timeline-role">Digital Inventory Analyst, NBC Ad Sales</div>
+                <ul class="timeline-bullets">
+                    <li>Collaborated with National Sales Planners on inventory avails and final sign-off on media plans.</li>
+                    <li>Forecasted and allocated Video and Display advertising inventory for The Fandango Network.</li>
+                    <li>Reviewed and approved insertion orders, communicating discrepancies effectively with the Planning team.</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot teal"></div>
+                <div class="timeline-meta">March 2015 to August 2021</div>
+                <div class="timeline-company teal">NBCUniversal</div>
+                <div class="timeline-role">Client Analyst, NBC News</div>
+                <ul class="timeline-bullets">
+                    <li>Queried, validated, and transformed large datasets into concise executive reports for strategic analytics initiatives.</li>
+                    <li>Tracked audience data for major events: Super Bowl, Olympics (2016, 2018, 2020), Emmy Awards, SNL, The Voice, and AGT.</li>
+                    <li>Monitored major news events including the 2016 &amp; 2020 Presidential Elections and the Covid-19 Pandemic.</li>
+                    <li>Spearheaded NBCUniversal News Group's first Well/Life Balance employee wellness event.</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-meta">October 2014 to March 2015</div>
+                <div class="timeline-company">Norsan Media</div>
+                <div class="timeline-role">Digital Content Specialist Trainee</div>
+                <ul class="timeline-bullets">
+                    <li>Reduced website bounce rate from 87% to 27% through strategic content scheduling using Google Analytics insights.</li>
+                    <li>Trained employees on WordPress content management.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Education -->
+        <div class="edu-block">
+            <span class="edu-icon">&#127891;</span>
+            <div>
+                <div class="edu-school">University of North Carolina Charlotte</div>
+                <div class="edu-detail">B.S. Marketing, Concentration in Marketing Analytics &middot; Minor: MIS &middot; GPA 3.74 &middot; Magna Cum Laude &middot; May 2015</div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="skills-wrap">
+            <span class="skills-label">Technical Skills</span>
+            <span class="chip coral">AI Agent Design</span>
+            <span class="chip coral">Workflow Automation</span>
+            <span class="chip coral">Project Management</span>
+            <span class="chip teal">Bilingual EN / ES</span>
+            <span class="chip">Survey Design &amp; Programming</span>
+            <span class="chip">Data Visualization</span>
+            <span class="chip">Power BI</span>
+            <span class="chip">SQL</span>
+            <span class="chip">Python / Pandas</span>
+            <span class="chip">Advanced Excel</span>
+            <span class="chip">Research &amp; Analysis</span>
+            <span class="chip">Forsta</span>
+            <span class="chip">Qualtrics</span>
+            <span class="chip">Cint</span>
+            <span class="chip">Meltwater</span>
+            <span class="chip">IQ Media</span>
+            <span class="chip">Google Analytics</span>
+            <span class="chip">Adobe Analytics</span>
+            <span class="chip">Salesforce</span>
+            <span class="chip">ESRI / Business Analyst</span>
+            <span class="chip">SharePoint</span>
+            <span class="skills-label">Soft Skills</span>
+            <span class="chip coral">Creative Problem-Solving</span>
+            <span class="chip coral">Initiative</span>
+            <span class="chip coral">Stakeholder Management</span>
+            <span class="chip">Cross-team Collaboration</span>
+            <span class="chip">Strategic Communication</span>
+            <span class="chip">Critical Thinking</span>
+            <span class="chip">Process Improvement</span>
+            <span class="chip">Adaptability</span>
+            <span class="chip">Curiosity</span>
+            <span class="chip">Self-motivated</span>
+            <span class="chip">Positive Leadership</span>
+            <span class="chip">Optimism</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+    <div class="container">
+        <p class="section-label">Beyond the resume</p>
+        <h2 class="section-title">A little about me</h2>
+
+        <div class="about-grid">
+            <div class="about-photo-wrap">
+                <img
+                    src="Shelter.jpg"
+                    alt="Sara volunteering at Burbank Animal Shelter"
+                    class="about-photo"
+                    onerror="this.style.display='none'; document.getElementById('photo-fallback').style.display='flex';"
+                >
+                <div id="photo-fallback" class="about-photo-fallback" style="display:none;">&#128062;</div>
+            </div>
+
+            <div class="about-bio">
+                <div class="lang-highlight">
+                    &#127482;&#127480; English &nbsp;&middot;&nbsp; &#127474;&#127485; Espa&ntilde;ol &nbsp;&middot;&nbsp; Fully bilingual, professionally and personally.
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label>Título</label>
-                <input type="text" id="eventTitle" placeholder="Ej: Cuidé a Max">
-            </div>
+                <p>
+                    I'm a creative problem-solver who finds energy at the intersection of technology, people, and data. I love building things that actually work — whether that's an AI workflow that saves a team hours every week, or an insight map that helps a client see their market clearly for the first time.
+                </p>
+                <p>
+                    Outside of work, I spend time on trails, at the Burbank Animal Shelter cheering on pups waiting for their forever homes, and planning the next trip. Life outside the office keeps me grounded, and it makes me better at my job.
+                </p>
+                <p>
+                    Being bilingual isn't just a skill on a resume. It shapes how I communicate, how I connect, and how I see the world.
+                </p>
 
-            <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 8px;">
-                    <input type="checkbox" id="multiDay" onchange="toggleMultiDay()" style="width: auto;">
-                    ¿Evento de varios días?
-                </label>
-            </div>
-
-            <div id="singleDateField" class="form-group">
-                <label>Fecha</label>
-                <input type="date" id="singleDate">
-            </div>
-
-            <div id="multiDateFields" class="extra-fields">
-                <div class="form-group">
-                    <label>Fecha inicio</label>
-                    <input type="date" id="startDate">
-                </div>
-                <div class="form-group">
-                    <label>Fecha fin</label>
-                    <input type="date" id="endDate">
-                </div>
-            </div>
-
-            <div id="perritosFields" class="extra-fields">
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="isDayBoarding" onchange="toggleDayBoarding()" style="width: auto;">
-                        ☀️ Day boarding (sin noche)
-                    </label>
-                </div>
-                <div id="overnightFields">
-                    <div class="form-group">
-                        <label>¿Cuántas noches?</label>
-                        <input type="number" id="noches" min="0" placeholder="0" oninput="calculateTotal()">
+                <div class="interests">
+                    <div class="interest-card">
+                        <span class="interest-icon">&#129406;</span>
+                        <div class="interest-title">Hiking</div>
+                        <div class="interest-desc">SoCal trails, fresh air, mountain views</div>
                     </div>
-                    <div class="form-group">
-                        <label>¿Cuánto por noche?</label>
-                        <input type="number" id="porNoche" min="0" step="0.01" placeholder="0.00" oninput="calculateTotal()">
+                    <div class="interest-card">
+                        <span class="interest-icon">&#128062;</span>
+                        <div class="interest-title">Dog Volunteering</div>
+                        <div class="interest-desc">Burbank Animal Shelter — helping pups find homes</div>
+                    </div>
+                    <div class="interest-card">
+                        <span class="interest-icon">&#9992;&#65039;</span>
+                        <div class="interest-title">Traveling</div>
+                        <div class="interest-desc">Mexico, South Korea, across the US &amp; beyond</div>
                     </div>
                 </div>
-                <div id="dayBoardingField" class="extra-fields">
-                    <div class="form-group">
-                        <label>¿Cuánto cobraste total?</label>
-                        <input type="number" id="dayBoardingPay" min="0" step="0.01" placeholder="0.00">
-                    </div>
-                </div>
-                <div class="total-display" id="totalPerritos">Total: $0.00</div>
             </div>
-
-            <div id="comidasFields" class="extra-fields">
-                <div class="form-group">
-                    <label>¿Cuánto gastaste?</label>
-                    <input type="number" id="gastoComida" min="0" step="0.01" placeholder="0.00">
-                </div>
-                <div class="form-group">
-                    <label>¿Dónde comiste? (opcional)</label>
-                    <input type="text" id="lugarComida" placeholder="Ej: Chipotle">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Notas (opcional)</label>
-                <textarea id="eventNotes" placeholder="Escribe aquí..."></textarea>
-            </div>
-
-            <button type="button" class="save-btn" onclick="saveEvent()">Guardar 💾</button>
         </div>
     </div>
+</section>
 
-    <script>
-        let currentYear = new Date().getFullYear();
-        let selectedMonth = null;
-        let selectedDate = null;
-        let selectedType = '';
-        let events = [];
 
-        const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        const typeIcons = {perritos: '🐕', voluntariado: '🦴', planes: '💕', comidas: '🍔', otros: '✨'};
-        const typeColors = {
-            perritos: '#a8d8ff',
-            planes: '#ffc0e5', 
-            voluntariado: '#fff4b8',
-            comidas: '#ffd4a3',
-            otros: '#d4a5ff'
-        };
+<!-- FOOTER -->
+<footer>
+    <p>
+        Sara Smith &nbsp;&middot;&nbsp; Los Angeles, CA &nbsp;&middot;&nbsp;
+        <a href="mailto:smith.sara0727@gmail.com">smith.sara0727@gmail.com</a>
+        &nbsp;&middot;&nbsp; <a href="https://github.com/SaraLM7" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </p>
+    <p style="margin-top: 0.4rem;">&#127482;&#127480; English &nbsp;&middot;&nbsp; &#127474;&#127485; Espa&ntilde;ol &nbsp;&middot;&nbsp; &copy; 2026</p>
+</footer>
 
-        function calculateTotal() {
-            const isDayBoarding = document.getElementById('isDayBoarding').checked;
-            if (isDayBoarding) {
-                const pay = parseFloat(document.getElementById('dayBoardingPay').value) || 0;
-                document.getElementById('totalPerritos').textContent = `Total: ${pay.toFixed(2)}`;
-            } else {
-                const noches = parseFloat(document.getElementById('noches').value) || 0;
-                const porNoche = parseFloat(document.getElementById('porNoche').value) || 0;
-                document.getElementById('totalPerritos').textContent = `Total: ${(noches * porNoche).toFixed(2)}`;
-            }
-        }
 
-        function toggleMultiDay() {
-            const isMultiDay = document.getElementById('multiDay').checked;
-            document.getElementById('singleDateField').style.display = isMultiDay ? 'none' : 'block';
-            document.getElementById('multiDateFields').classList.toggle('show', isMultiDay);
-            
-            // When switching to multi-day, set end date to same as start if not set
-            if (isMultiDay && !document.getElementById('endDate').value) {
-                const startVal = document.getElementById('startDate').value || selectedDate;
-                document.getElementById('endDate').value = startVal;
-            }
-        }
-
-        function toggleDayBoarding() {
-            const isDayBoarding = document.getElementById('isDayBoarding').checked;
-            document.getElementById('overnightFields').style.display = isDayBoarding ? 'none' : 'block';
-            document.getElementById('dayBoardingField').classList.toggle('show', isDayBoarding);
-            calculateTotal();
-        }
-
-        document.getElementById('dayBoardingPay').addEventListener('input', calculateTotal);
-
-        function loadData() {
-            const saved = localStorage.getItem('calendarioPersonal');
-            if (saved) events = JSON.parse(saved);
-        }
-
-        function saveData() {
-            localStorage.setItem('calendarioPersonal', JSON.stringify(events));
-        }
-
-        function init() {
-            loadData();
-            document.getElementById('currentYear').textContent = currentYear;
-            document.getElementById('statsYear').textContent = currentYear;
-            renderMonthsGrid();
-            updateStats();
-        }
-
-        function changeYear(delta) {
-            currentYear += delta;
-            document.getElementById('currentYear').textContent = currentYear;
-            renderMonthsGrid();
-            updateStats();
-        }
-
-        function renderMonthsGrid() {
-            const grid = document.getElementById('monthsGrid');
-            grid.innerHTML = '';
-            months.forEach((month, i) => {
-                const monthEvents = events.filter(e => {
-                    const eDate = new Date(e.date);
-                    if (e.startDate && e.endDate) {
-                        const monthStart = new Date(currentYear, i, 1);
-                        const monthEnd = new Date(currentYear, i + 1, 0);
-                        const start = new Date(e.startDate);
-                        const end = new Date(e.endDate);
-                        return (start <= monthEnd && end >= monthStart);
-                    }
-                    return eDate.getFullYear() === currentYear && eDate.getMonth() === i;
-                });
-                const card = document.createElement('div');
-                card.className = 'month-card' + (monthEvents.length > 0 ? ' has-events' : '');
-                card.onclick = () => openMonth(i);
-                card.innerHTML = `<div class="month-name">${month}</div><div class="month-count">${monthEvents.length} evento${monthEvents.length !== 1 ? 's' : ''}</div>`;
-                grid.appendChild(card);
-            });
-        }
-
-        function openMonth(i) {
-            selectedMonth = i;
-            document.getElementById('monthsView').style.display = 'none';
-            document.getElementById('calendarView').classList.add('active');
-            document.getElementById('monthTitle').textContent = `${months[i]} ${currentYear}`;
-            renderCalendar();
-        }
-
-        function backToMonths() {
-            document.getElementById('calendarView').classList.remove('active');
-            document.getElementById('monthsView').style.display = 'block';
-            renderMonthsGrid();
-        }
-
-        function renderCalendar() {
-            const firstDay = new Date(currentYear, selectedMonth, 1);
-            const lastDay = new Date(currentYear, selectedMonth + 1, 0);
-            const prevLastDay = new Date(currentYear, selectedMonth, 0);
-            const grid = document.getElementById('daysGrid');
-            grid.innerHTML = '';
-
-            for (let i = firstDay.getDay() - 1; i >= 0; i--) {
-                const day = document.createElement('div');
-                day.className = 'day other-month';
-                day.textContent = prevLastDay.getDate() - i;
-                grid.appendChild(day);
-            }
-
-            const today = new Date();
-            for (let i = 1; i <= lastDay.getDate(); i++) {
-                const day = document.createElement('div');
-                day.className = 'day';
-                day.textContent = i;
-                const dateStr = `${currentYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                
-                const dayEvents = events.filter(e => {
-                    if (e.startDate && e.endDate) {
-                        const start = new Date(e.startDate + 'T00:00:00');
-                        const end = new Date(e.endDate + 'T00:00:00');
-                        const current = new Date(dateStr + 'T00:00:00');
-                        return current >= start && current <= end;
-                    }
-                    return e.date === dateStr;
-                });
-                
-                if (dayEvents.length > 0) {
-                    day.classList.add('has-event');
-                    
-                    if (dayEvents.length === 1) {
-                        day.classList.add('event-' + dayEvents[0].type);
-                    } else if (dayEvents.length === 2) {
-                        day.classList.add('event-two-1');
-                        day.style.setProperty('--color1', typeColors[dayEvents[0].type]);
-                        day.style.setProperty('--color2', typeColors[dayEvents[1].type]);
-                    } else if (dayEvents.length === 3) {
-                        day.classList.add('event-three-1');
-                        day.style.setProperty('--color1', typeColors[dayEvents[0].type]);
-                        day.style.setProperty('--color2', typeColors[dayEvents[1].type]);
-                        day.style.setProperty('--color3', typeColors[dayEvents[2].type]);
-                    } else {
-                        day.classList.add('event-multiple');
-                    }
-                }
-                
-                if (today.getDate() === i && today.getMonth() === selectedMonth && today.getFullYear() === currentYear && dayEvents.length === 0) {
-                    day.classList.add('today');
-                }
-                day.onclick = () => openDayModal(i);
-                grid.appendChild(day);
-            }
-
-            const remaining = 42 - grid.children.length;
-            for (let i = 1; i <= remaining; i++) {
-                const day = document.createElement('div');
-                day.className = 'day other-month';
-                day.textContent = i;
-                grid.appendChild(day);
-            }
-        }
-
-        function openDayModal(day) {
-            selectedDate = `${currentYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const date = new Date(currentYear, selectedMonth, day);
-            const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
-            document.getElementById('dayModalTitle').textContent = `${dayName.charAt(0).toUpperCase() + dayName.slice(1)}, ${day} de ${months[selectedMonth]} ${currentYear}`;
-            
-            // Set default dates in form to current month/day
-            document.getElementById('singleDate').value = selectedDate;
-            document.getElementById('startDate').value = selectedDate;
-            
-            const dayEvents = events.filter(e => {
-                if (e.startDate && e.endDate) {
-                    const start = new Date(e.startDate + 'T00:00:00');
-                    const end = new Date(e.endDate + 'T00:00:00');
-                    const current = new Date(selectedDate + 'T00:00:00');
-                    return current >= start && current <= end;
-                }
-                return e.date === selectedDate;
-            });
-            
-            const list = document.getElementById('dayEventsList');
-            if (dayEvents.length === 0) {
-                list.innerHTML = '<div style="text-align:center;padding:30px;color:#999"><div style="font-size:50px">📅</div><div>No hay eventos este día</div></div>';
-            } else {
-                list.innerHTML = dayEvents.map(e => {
-                    let details = '';
-                    if (e.type === 'perritos' && e.total) {
-                        if (e.isDayBoarding) {
-                            details = `<div class="event-details">☀️ Day boarding<br>💰 Total: ${parseFloat(e.total).toFixed(2)}</div>`;
-                        } else {
-                            details = `<div class="event-details">${e.noches ? `🌙 ${e.noches} noche${e.noches > 1 ? 's' : ''} × ${e.porNoche || 0}<br>` : ''}💰 Total: ${parseFloat(e.total).toFixed(2)}</div>`;
-                        }
-                    } else if (e.type === 'comidas' && e.gasto) {
-                        details = `<div class="event-details">💵 Gastaste: ${parseFloat(e.gasto).toFixed(2)}${e.lugar ? `<br>📍 ${e.lugar}` : ''}</div>`;
-                    }
-                    
-                    let dateInfo = '';
-                    if (e.startDate && e.endDate) {
-                        const start = new Date(e.startDate);
-                        const end = new Date(e.endDate);
-                        dateInfo = `<div class="event-details">📅 ${start.getDate()}/${start.getMonth()+1} - ${end.getDate()}/${end.getMonth()+1}</div>`;
-                    }
-                    
-                    return `<div class="event-card ${e.type}"><div class="event-header"><span class="event-type">${typeIcons[e.type]}</span><span class="event-title">${e.title}</span></div>${dateInfo}${details}${e.notes ? `<div class="event-details">${e.notes}</div>` : ''}<div style="display:flex;gap:8px;margin-top:8px;margin-left:26px;"><button class="delete-btn" onclick="event.stopPropagation(); editEvent(${e.id})" style="background:#4facfe;">✏️ Editar</button><button class="delete-btn" onclick="event.stopPropagation(); deleteEvent(${e.id})">🗑️ Eliminar</button></div></div>`;
-                }).join('');
-            }
-            document.getElementById('dayModal').classList.add('show');
-        }
-
-        function closeDayModal() {
-            document.getElementById('dayModal').classList.remove('show');
-        }
-
-        function showAddForm() {
-            // Set default dates to the selected date or current viewing month
-            if (!document.getElementById('singleDate').value) {
-                document.getElementById('singleDate').value = selectedDate;
-            }
-            if (!document.getElementById('startDate').value) {
-                document.getElementById('startDate').value = selectedDate;
-            }
-            if (!document.getElementById('endDate').value) {
-                // Default end date to same as start
-                document.getElementById('endDate').value = selectedDate;
-            }
-            document.getElementById('addModal').classList.add('show');
-        }
-
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('show');
-            editingEventId = null;
-            resetForm();
-        }
-
-        function resetForm() {
-            selectedType = '';
-            document.getElementById('eventTitle').value = '';
-            document.getElementById('eventNotes').value = '';
-            document.getElementById('multiDay').checked = false;
-            document.getElementById('singleDate').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            document.getElementById('isDayBoarding').checked = false;
-            document.getElementById('noches').value = '';
-            document.getElementById('porNoche').value = '';
-            document.getElementById('dayBoardingPay').value = '';
-            document.getElementById('gastoComida').value = '';
-            document.getElementById('lugarComida').value = '';
-            document.getElementById('totalPerritos').textContent = 'Total: $0.00';
-            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-            document.getElementById('perritosFields').classList.remove('show');
-            document.getElementById('comidasFields').classList.remove('show');
-            document.getElementById('singleDateField').style.display = 'block';
-            document.getElementById('multiDateFields').classList.remove('show');
-            document.getElementById('overnightFields').style.display = 'block';
-            document.getElementById('dayBoardingField').classList.remove('show');
-        }
-
-        function selectType(type) {
-            selectedType = type;
-            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-            event.target.classList.add('selected');
-            document.getElementById('perritosFields').classList.remove('show');
-            document.getElementById('comidasFields').classList.remove('show');
-            if (type === 'perritos') document.getElementById('perritosFields').classList.add('show');
-            else if (type === 'comidas') document.getElementById('comidasFields').classList.add('show');
-        }
-
-        function saveEvent() {
-            if (!selectedType) { alert('¡Selecciona qué tipo de actividad es! 🐕'); return; }
-            const title = document.getElementById('eventTitle').value.trim();
-            if (!title) { alert('¡Escribe un título! 📝'); return; }
-
-            const isMultiDay = document.getElementById('multiDay').checked;
-            let startDate, endDate;
-            
-            if (isMultiDay) {
-                startDate = document.getElementById('startDate').value;
-                endDate = document.getElementById('endDate').value;
-                if (!startDate || !endDate) { alert('¡Completa las fechas de inicio y fin!'); return; }
-                if (startDate > endDate) { alert('¡La fecha de inicio debe ser antes que la de fin!'); return; }
-            } else {
-                startDate = endDate = document.getElementById('singleDate').value || selectedDate;
-            }
-
-            const ev = {
-                id: editingEventId || Date.now(),
-                type: selectedType,
-                title: title,
-                date: startDate,
-                startDate: isMultiDay ? startDate : null,
-                endDate: isMultiDay ? endDate : null,
-                notes: document.getElementById('eventNotes').value.trim()
-            };
-
-            if (selectedType === 'perritos') {
-                const isDayBoarding = document.getElementById('isDayBoarding').checked;
-                ev.isDayBoarding = isDayBoarding;
-                
-                if (isDayBoarding) {
-                    const pay = parseFloat(document.getElementById('dayBoardingPay').value) || 0;
-                    ev.total = pay;
-                } else {
-                    const noches = parseFloat(document.getElementById('noches').value) || 0;
-                    const porNoche = parseFloat(document.getElementById('porNoche').value) || 0;
-                    ev.noches = noches;
-                    ev.porNoche = porNoche;
-                    ev.total = noches * porNoche;
-                }
-            } else if (selectedType === 'comidas') {
-                ev.gasto = parseFloat(document.getElementById('gastoComida').value) || 0;
-                ev.lugar = document.getElementById('lugarComida').value.trim();
-            }
-
-            if (editingEventId) {
-                // Update existing event
-                const index = events.findIndex(e => e.id === editingEventId);
-                if (index !== -1) {
-                    events[index] = ev;
-                }
-                editingEventId = null;
-            } else {
-                // Add new event
-                events.push(ev);
-            }
-            
-            saveData();
-            closeAddModal();
-            renderCalendar();
-            updateStats();
-            openDayModal(parseInt(selectedDate.split('-')[2]));
-        }
-
-        function updateStats() {
-            document.getElementById('statsYear').textContent = currentYear;
-            const yearEvents = events.filter(e => e.date.startsWith(currentYear.toString()));
-            let totalNoches = 0, totalGanado = 0, totalComidas = 0, totalVoluntariados = 0, totalPlanes = 0;
-            yearEvents.forEach(e => {
-                if (e.type === 'perritos') {
-                    totalNoches += parseInt(e.noches || 0);
-                    totalGanado += parseFloat(e.total || 0);
-                } else if (e.type === 'comidas') totalComidas += parseFloat(e.gasto || 0);
-                else if (e.type === 'voluntariado') totalVoluntariados++;
-                else if (e.type === 'planes') totalPlanes++;
-            });
-            document.getElementById('totalNoches').textContent = totalNoches;
-            document.getElementById('totalGanado').textContent = '$' + totalGanado.toFixed(2);
-            document.getElementById('totalComidas').textContent = '$' + totalComidas.toFixed(2);
-            document.getElementById('totalVoluntariados').textContent = totalVoluntariados;
-            document.getElementById('totalPlanes').textContent = totalPlanes;
-        }
-
-        function deleteEvent(id) {
-            if (confirm('¿Segura que quieres eliminar? 🤔')) {
-                events = events.filter(e => e.id !== id);
-                saveData();
-                renderCalendar();
-                updateStats();
-                openDayModal(parseInt(selectedDate.split('-')[2]));
-            }
-        }
-
-        let editingEventId = null;
-
-        function editEvent(id) {
-            const event = events.find(e => e.id === id);
-            if (!event) return;
-            
-            editingEventId = id;
-            closeDayModal();
-            
-            // Fill form with existing data
-            selectedType = event.type;
-            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-            document.querySelectorAll('.type-btn').forEach(b => {
-                if (b.textContent.includes(typeIcons[event.type])) {
-                    b.classList.add('selected');
-                }
-            });
-            
-            document.getElementById('eventTitle').value = event.title;
-            document.getElementById('eventNotes').value = event.notes || '';
-            
-            // Handle multi-day
-            if (event.startDate && event.endDate) {
-                document.getElementById('multiDay').checked = true;
-                document.getElementById('startDate').value = event.startDate;
-                document.getElementById('endDate').value = event.endDate;
-                toggleMultiDay();
-            } else {
-                document.getElementById('multiDay').checked = false;
-                document.getElementById('singleDate').value = event.date;
-            }
-            
-            // Show type-specific fields
-            if (event.type === 'perritos') {
-                document.getElementById('perritosFields').classList.add('show');
-                if (event.isDayBoarding) {
-                    document.getElementById('isDayBoarding').checked = true;
-                    document.getElementById('dayBoardingPay').value = event.total || 0;
-                    toggleDayBoarding();
-                } else {
-                    document.getElementById('isDayBoarding').checked = false;
-                    document.getElementById('noches').value = event.noches || 0;
-                    document.getElementById('porNoche').value = event.porNoche || 0;
-                    toggleDayBoarding();
-                }
-                calculateTotal();
-            } else if (event.type === 'comidas') {
-                document.getElementById('comidasFields').classList.add('show');
-                document.getElementById('gastoComida').value = event.gasto || 0;
-                document.getElementById('lugarComida').value = event.lugar || '';
-            }
-            
-            showAddForm();
-        }
-
-        window.onclick = function(e) {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('show');
-                resetForm();
-            }
-        }
-
-        function exportData() {
-            try {
-                const dataStr = JSON.stringify(events, null, 2);
-                const dataBlob = new Blob([dataStr], {type: 'application/json'});
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                const date = new Date().toISOString().split('T')[0];
-                link.download = 'mi-calendario-backup-' + date + '.json';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                setTimeout(() => alert('✅ Datos exportados! Guarda este archivo en un lugar seguro.'), 100);
-            } catch (error) {
-                alert('❌ Error al exportar: ' + error.message);
-            }
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedEvents = JSON.parse(e.target.result);
-                    if (confirm('¿Importar ' + importedEvents.length + ' eventos? Esto reemplazará tus datos actuales.')) {
-                        events = importedEvents;
-                        saveData();
-                        renderMonthsGrid();
-                        updateStats();
-                        alert('✅ Datos importados correctamente!');
-                    }
-                } catch (error) {
-                    alert('❌ Error: El archivo no es válido.');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        init();
-    </script>
 </body>
 </html>
